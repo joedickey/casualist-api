@@ -3,7 +3,9 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
-const { NODE_ENV, ClIENT_ORIGIN } = require('./config')
+const { NODE_ENV, ClIENT_ORIGIN, API_TOKEN } = require('./config')
+const listsRouter = require('./lists/lists-router')
+const itemsRouter = require('./items/items-router')
 
 const app = express()
 
@@ -19,9 +21,17 @@ app.use(
     })
 )
 
-app.get('/api/*', (req, res) => {
-    res.json({ok: true});
-  });
+app.use(function validateBearerToken(req, res, next) {
+    const authToken = req.get('Authorization')
+  
+    if (!authToken || authToken.split(' ')[1] !== API_TOKEN) {
+      return res.status(401).json({ error: 'Unauthorized request' })
+    }
+    next()
+  })
+
+app.use('/api/lists', listsRouter)
+app.use('/api/items', itemsRouter)
 
 
 app.use(function errorHandler(error, req, res, next) {
