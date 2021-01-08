@@ -1,5 +1,6 @@
 const express = require('express')
 const xss = require('xss')
+const ListsService = require('./lists-service')
 
 const listsRouter = express.Router()
 const jsonParser = express.json()
@@ -33,9 +34,22 @@ listsRouter
 listsRouter
     .route('/')
     .post(jsonParser, (req, res, next) => {
-        res.status(201)
-            .send('Successful POST')
-            .catch(next)
+        const knexInstance = req.app.get('db')
+        const { url_path, name, item_order  } = req.body
+        const newList = {url_path, name, item_order}
+
+        for(const [key, value] of Object.entries(newList))
+            if(value == null)
+                return res.status(400).json({
+                    error: { message: `Missing '${key}' in request body` }
+                })
+
+        ListsService.createList(knexInstance, newList )
+                .then(list => {
+                    res.status(201)
+                        .json(serializeList(list))
+                })
+                .catch(next)
     })
 
 module.exports = listsRouter;

@@ -4,3 +4,6 @@ CREATE TABLE lists (
     name TEXT NOT NULL,
     item_order int[] DEFAULT '{}'
 );
+
+CREATE UNIQUE INDEX url_path_index
+ON lists (url_path);
