@@ -1,3 +1,3 @@
 DROP TABLE IF EXISTS items;
 
-DROP TYPE assign_options;
+DROP TYPE status_options;

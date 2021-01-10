@@ -9,15 +9,30 @@ const serializeList = list => ({
     id: list.id,
     url_path: list.url_path, // replace id on client side and index in db
     name: xss(list.name),
-    item_order: list.item_order
+    item_order: list.item_order,
+    
+})
+
+const serializeItem = item => ({
+    id: item.id,
+    list_id: item.list_id,
+    name: xss(item.name),
+    assign: xss(item.assign),
+    status: item.status,
+    notes: xss(item.notes)
 })
 
 listsRouter
-    .route('/:list_id') // add .all route to make sure list exists
+    .route('/:url_path') // add .all route to make sure list exists
     .get((req, res, next) => {
-        res.status(200)
-            .send(`Successful GET of list: ${req.params.list_id}`)
+        const knexInstance = req.app.get('db')
+        const urlPath = req.params.url_path
+
+        ListsService.getList(knexInstance, urlPath)
+            .then(list => res.json(serializeList(list)))
             .catch(next)
+            
+
     })
     .patch(jsonParser, (req, res, next) => {
         res.status(204)
@@ -25,8 +40,24 @@ listsRouter
             .catch(next)
     })
     .delete((req, res, next) => {
-        res.status(204)
-            .end()
+        const knexInstance = req.app.get('db')
+        const urlPath = req.params.url_path
+
+        ListsService.deleteList(knexInstance, urlPath)
+            .then(numRowsAffected => {
+                res.status(204).end()
+            })
+            .catch(next)
+    })
+
+listsRouter
+    .route('/listitems/:list_id')
+    .get((req, res, next) => {
+        const knexInstance = req.app.get('db')
+        const list_id = req.params.list_id
+
+        ListsService.getListItems(knexInstance, list_id)
+            .then(data => res.json(data))  //serialize?
             .catch(next)
     })
     
