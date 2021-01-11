@@ -15,19 +15,44 @@ const serializeItem = item => ({
 })
 
 itemsRouter
-    .route('/:item_id') // add .all route to make sure item exists
-    .get((req, res, next) => {
+    .route('/:item_id')
+    .all((req, res, next) => {
         const knexInstance = req.app.get('db')
         const itemId = req.params.item_id
 
         ItemsService.getItem(knexInstance, itemId)
-            .then(data => res.json(data))
+            .then(item => {
+                if(!item) {
+                    return res.status(404).json({
+                        error: {message: 'Item does not exist'}
+                    })
+                }
+                res.item = item
+                next()
+            })
             .catch(next)
     })
+    .get((req, res, next) => {
+        res.json(serializeItem(res.item))
+    })
     .patch(jsonParser, (req, res, next) => {
-        res.status(204)
-            .end()
-            .catch(next)
+        const knexInstance = req.app.get('db')
+        const itemId = req.params.item_id
+        const { name, assign, status, notes } = req.body
+        const itemToUpdate = { name, assign, status, notes }
+
+        const numberOfValues = Object.values(itemToUpdate).filter(Boolean).length
+            if(numberOfValues === 0) 
+                return res.status(400).json({
+                    error: { message: `Request body must contain updated content`}
+                })
+        
+        ItemsService.updateItem(knexInstance, itemId, itemToUpdate)
+                .then(numRowsAffected => {
+                    res.status(204).end()
+                })
+                .catch(next)
+
     })
     .delete((req, res, next) => {
         const knexInstance = req.app.get('db')

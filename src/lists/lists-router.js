@@ -24,40 +24,100 @@ const serializeItem = item => ({
 
 listsRouter
     .route('/:url_path') // add .all route to make sure list exists
-    .get((req, res, next) => {
+    .all((req, res, next) => {
         const knexInstance = req.app.get('db')
         const urlPath = req.params.url_path
 
         ListsService.getList(knexInstance, urlPath)
-            .then(list => res.json(serializeList(list)))
+            .then(list => {
+                if(!list) {
+                    return res.status(404).json({
+                        error: {message: 'List does not exist'}
+                    })
+                }
+                res.list = list
+                next()
+            })
             .catch(next)
-            
-
+    })
+    .get((req, res, next) => {
+        res.json(serializeList(res.list))
     })
     .patch(jsonParser, (req, res, next) => {
-        res.status(204)
-            .end()
-            .catch(next)
-    })
-    .delete((req, res, next) => {
         const knexInstance = req.app.get('db')
         const urlPath = req.params.url_path
+        const { name, item_order } = req.body
+        const listToUpdate = { name, item_order }
 
-        ListsService.deleteList(knexInstance, urlPath)
-            .then(numRowsAffected => {
-                res.status(204).end()
+        const numberOfValues = Object.values(listToUpdate).filter(Boolean).length
+            if(numberOfValues === 0) 
+                return res.status(400).json({
+                    error: { message: `Request body must contain updated content`}
+                })
+        
+        ListsService.updateList(knexInstance, urlPath, listToUpdate)
+                .then(numRowsAffected => {
+                    res.status(204).end()
+                })
+                .catch(next)
+
+    })
+    .delete((req, res, next) => { // not used clientside but created anyways
+        const knexInstance = req.app.get('db')
+        const urlPath = req.params.url_path
+        const listId = res.list.id
+
+        ListsService.getListItems(knexInstance, listId)
+            .then(data => {
+                const saniArry = []
+                data.forEach(item => {
+                    saniArry.push(serializeItem(item))
+                    }) 
+
+                if(saniArry == '') {
+                    ListsService.deleteList(knexInstance, urlPath)
+                        .then(numRowsAffected => {
+                            return res.status(204).end()
+                        })
+                }
+
+                else return res.status(400).json({
+                    error: { message: `Cannot delete list because of associated items.`}
+                })
             })
             .catch(next)
     })
 
 listsRouter
     .route('/listitems/:list_id')
-    .get((req, res, next) => {
+    .all((req, res, next) => {
         const knexInstance = req.app.get('db')
         const list_id = req.params.list_id
 
+        ListsService.getListById(knexInstance, list_id)
+            .then(list => {
+                if(!list) {
+                    return res.status(404).json({
+                        error: {message: 'List does not exist'}
+                    })
+                }
+                res.list = list
+                next()
+            })
+            .catch(next)
+    })
+    .get((req, res, next) => {
+        const knexInstance = req.app.get('db')
+        const list_id = res.list.id
+
         ListsService.getListItems(knexInstance, list_id)
-            .then(data => res.json(data))  //serialize?
+            .then(data => {
+                const saniArry = []
+                data.forEach(item => {
+                    saniArry.push(serializeItem(item))
+                    }) 
+                res.json(saniArry)
+            })
             .catch(next)
     })
     
