@@ -14,6 +14,9 @@
     "deploy": "git push heroku HEAD:master"
   },
   "keywords": [],
+  "engines": {
+    "node": "12.18.4"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
