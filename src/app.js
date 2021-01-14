@@ -23,7 +23,7 @@ app.use(cors(corsOptions))
 
 app.use(function validateBearerToken(req, res, next) {
     const authToken = req.get('Authorization')
-  
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     if (!authToken || authToken.split(' ')[1] !== API_TOKEN) {
       return res.status(401).json({ error: 'Unauthorized request' })
     }
