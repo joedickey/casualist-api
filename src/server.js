@@ -5,13 +5,10 @@ const { PORT, DATABASE_URL} = require('./config')
 const db = knex({
     client: 'pg',
     connection: DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false
-    }
   })
   
   app.set('db', db)
 
-app.listen(PORT, () => `Listening on port ${PORT}`);
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
 module.exports = {app};
