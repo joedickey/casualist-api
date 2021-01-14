@@ -14,7 +14,7 @@ const morganOption = (NODE_ENV === 'production')
   : 'common';
 
 const corsOptions = {
-  origin: 'http://localhost:3000'
+  origin: 'https://casualist.vercel.app'
 }
 
 app.use(morgan(morganOption))
