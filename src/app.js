@@ -3,7 +3,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
-const { NODE_ENV, ClIENT_ORIGIN, API_TOKEN } = require('./config')
+const { NODE_ENV, API_TOKEN } = require('./config')
 const listsRouter = require('./lists/lists-router')
 const itemsRouter = require('./items/items-router')
 
