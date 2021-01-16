@@ -1,26 +1,50 @@
-# Express Boilerplate!
+# Casualist: The fast-casual checklist maker.
 
-This is a boilerplate project used for starting new projects!
+Casualist helps you easily and quickly create a dynamic and collaborative checklist. 
 
-## Set up
+Live Version: <https://casualist.vercel.app/>
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+![Imgur](https://i.imgur.com/tnTWY7f.png)
+![Imgur](https://i.imgur.com/7yF0231.png)
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+## Summary
 
-## Scripts
+Casualist helps users easily and quickly create a dynamic and collaborative checklist.  Simply submit a title on the landing page to generate a new list. This list will have a unique URL path that can then be shared with any collaborators. Users can add, delete, and edit items as well as filter the list by status or asssignee. When displaying all items on the list a user can utilize drag and drop to reorganize tasks. No sign-up or login needed. No wasted time.
 
-Start the application `npm start`
+## API
 
-Start nodemon for the application `npm run dev`
+This API is used to create, update, and delete lists and corresponding list items for the Casualist web app in a PostgreSQL database.
 
-Run the tests `npm test`
+Base URL: https://desolate-beach-32598.herokuapp.com/api
 
-## Deploying
+Available endpoints include:
+* /lists
+* /lists/:url_path
+* /listitems/:list_id
+* /items
+* /items/:item_id
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+
+Supported HTTP methods:
+* GET
+* POST
+* PATCH
+* DELETE
+
+
+## Technology Used
+
+### Back End
+* Node.js
+* Express
+* SQL
+* PostgreSQL
+* Knex
+
+
+## Testing
+* Mocha
+* Supertest
+
+## Production
+* Heroku
