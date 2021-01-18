@@ -5,7 +5,7 @@ const ItemsService = require('./items-service');
 const itemsRouter = express.Router();
 const jsonParser = express.json();
 
-const serializeItem = item => ({
+const serializeItem = item => ({ // used to format response as well as sanitize any user input to prevent xss attacks
     id: item.id,
     list_id: item.list_id,
     name: xss(item.name),
@@ -16,7 +16,7 @@ const serializeItem = item => ({
 
 itemsRouter
     .route('/:item_id')
-    .all((req, res, next) => {
+    .all((req, res, next) => { // first checks to make sure the item exists
         const knexInstance = req.app.get('db');
         const itemId = req.params.item_id;
 
@@ -41,7 +41,7 @@ itemsRouter
         const { name, assign, status, notes } = req.body;
         const itemToUpdate = { name, assign, status, notes };
 
-        const numberOfValues = Object.values(itemToUpdate).filter(Boolean).length;
+        const numberOfValues = Object.values(itemToUpdate).filter(Boolean).length; // checking that at least one new value is provided
         if(numberOfValues === 0) 
             return res.status(400).json({
                 error: { message: `Request body must contain updated content`}
@@ -73,7 +73,7 @@ itemsRouter
         const { list_id, name, assign, notes } = req.body;
         const newItem = {list_id, name, assign, notes};
 
-        for(const [key, value] of Object.entries(newItem))
+        for(const [key, value] of Object.entries(newItem)) // checks to see if any of the required keys are missing from the body object
             if(value == null)
                 return res.status(400).json({
                     error: { message: `Missing '${key}' in request body` }

@@ -5,15 +5,15 @@ const ListsService = require('./lists-service');
 const listsRouter = express.Router();
 const jsonParser = express.json();
 
-const serializeList = list => ({
+const serializeList = list => ({ // used to format response as well as sanitize any user input to prevent xss attacks
     id: list.id,
-    url_path: list.url_path, // replace id on client side and index in db
+    url_path: list.url_path, 
     name: xss(list.name),
     item_order: list.item_order,
     
 });
 
-const serializeItem = item => ({
+const serializeItem = item => ({ // used to format response as well as sanitize any user input to prevent xss attacks
     id: item.id,
     list_id: item.list_id,
     name: xss(item.name),
@@ -23,8 +23,8 @@ const serializeItem = item => ({
 });
 
 listsRouter
-    .route('/:url_path') // add .all route to make sure list exists
-    .all((req, res, next) => {
+    .route('/:url_path') 
+    .all((req, res, next) => { // first verifies that the list exists
         const knexInstance = req.app.get('db');
         const urlPath = req.params.url_path;
 
@@ -49,7 +49,7 @@ listsRouter
         const { name, item_order } = req.body;
         const listToUpdate = { name, item_order };
 
-        const numberOfValues = Object.values(listToUpdate).filter(Boolean).length;
+        const numberOfValues = Object.values(listToUpdate).filter(Boolean).length; // checking that at least one new value is provided
         if(numberOfValues === 0) 
             return res.status(400).json({
                 error: { message: `Request body must contain updated content`}
@@ -90,7 +90,7 @@ listsRouter
 
 listsRouter
     .route('/listitems/:list_id')
-    .all((req, res, next) => {
+    .all((req, res, next) => { // checks to make sure list exists before proceeding
         const knexInstance = req.app.get('db');
         const list_id = req.params.list_id;
 
@@ -114,7 +114,7 @@ listsRouter
             .then(data => {
                 const saniArry = [];
                 data.forEach(item => {
-                    saniArry.push(serializeItem(item));
+                    saniArry.push(serializeItem(item)); // formatting and sanitizing each item in the response array
                 }); 
                 res.json(saniArry);
             })
@@ -129,7 +129,7 @@ listsRouter
         const { url_path, name, item_order } = req.body;
         const newList = {url_path, name, item_order};
 
-        for(const [key, value] of Object.entries(newList))
+        for(const [key, value] of Object.entries(newList)) // checks to see if any of the required keys are missing from the body object
             if(value == null)
                 return res.status(400).json({
                     error: { message: `Missing '${key}' in request body` }

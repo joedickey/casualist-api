@@ -34,7 +34,7 @@ app.use('/api/lists', listsRouter);
 app.use('/api/items', itemsRouter);
 
 
-app.use(function errorHandler(error, req, res, next) {
+app.use(function errorHandler(error, req, res, next) { // handles any uncaught errors
     let response;
     if (NODE_ENV !== 'production') {
         response = { error: { message: 'server error' } };
