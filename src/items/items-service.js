@@ -3,24 +3,24 @@ const ItemsService = {
         return db('items')
             .insert(data)
             .returning('*')
-            .then(rows => rows[0])
+            .then(rows => rows[0]);
     },
     getItem(db, id) {
         return db('items')
             .select('*')
             .where({id: id})
-            .then(rows => rows[0])
+            .then(rows => rows[0]);
     },
     deleteItem(db, id) {
         return db('items')
             .where({id: id})
-            .delete()
+            .delete();
     },
     updateItem(db, id, data){
         return db('items')
             .where({id: id})
-            .update(data)
+            .update(data);
     }
-}
+};
 
 module.exports = ItemsService;
